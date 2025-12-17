@@ -69,11 +69,40 @@ st.markdown("""
         margin-bottom: 2rem;
     }
     .feature-card {
-        background: #f8f9fa;
+        background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
+        color: white;
         padding: 1.5rem;
         border-radius: 10px;
-        border-left: 4px solid #667eea;
+        border-left: 4px solid #ffffff;
         margin: 1rem 0;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .feature-card h4, .feature-card p {
+        color: white !important;
+    }
+    
+    /* Main content container styling */
+    .main .block-container {
+        background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%) !important;
+        padding: 2rem !important;
+        border-radius: 10px !important;
+        margin-top: 1rem !important;
+    }
+    
+    /* Streamlit containers */
+    .stContainer > div {
+        background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%) !important;
+        border-radius: 8px !important;
+        padding: 1rem !important;
+    }
+    
+    /* Empty areas and waiting states */
+    .stEmpty, [data-testid="stEmpty"] {
+        background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%) !important;
+        border-radius: 8px !important;
+        padding: 2rem !important;
+        min-height: 200px !important;
     }
     .metric-card {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -82,27 +111,67 @@ st.markdown("""
         color: white;
         text-align: center;
     }
+    
+    /* Override Streamlit's built-in metric styling to use consistent colors */
+    [data-testid="metric-container"] {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+        border: none !important;
+        padding: 1rem !important;
+        border-radius: 8px !important;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+    }
+    
+    [data-testid="metric-container"] > div {
+        color: white !important;
+    }
+    
+    [data-testid="metric-container"] label {
+        color: rgba(255, 255, 255, 0.8) !important;
+        font-size: 0.9rem !important;
+    }
+    
+    [data-testid="metric-container"] [data-testid="metric-value"] {
+        color: white !important;
+        font-size: 1.5rem !important;
+        font-weight: bold !important;
+    }
     .result-card {
-        background: white;
+        background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
+        color: white;
         padding: 1.5rem;
         border-radius: 10px;
         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         margin: 1rem 0;
-        border-left: 4px solid #28a745;
+        border-left: 4px solid #ffffff;
     }
     .drug-suggestion {
-        background: #e8f5e8;
+        background: linear-gradient(135deg, #5ca3f5 0%, #4285f4 100%);
+        color: white;
         padding: 1rem;
         border-radius: 8px;
-        border: 1px solid #28a745;
+        border: 1px solid #ffffff;
         margin: 0.5rem 0;
     }
     .doctor-suggestion {
-        background: #e3f2fd;
+        background: linear-gradient(135deg, #6bb6ff 0%, #4dabf7 100%);
+        color: white;
         padding: 1rem;
         border-radius: 8px;
-        border: 1px solid #2196f3;
+        border: 1px solid #ffffff;
         margin: 0.5rem 0;
+    }
+    
+    /* Ensure all text in suggestion cards is white */
+    .drug-suggestion h5, .drug-suggestion p, .drug-suggestion small {
+        color: white !important;
+    }
+    
+    .doctor-suggestion h5, .doctor-suggestion p, .doctor-suggestion small {
+        color: white !important;
+    }
+    
+    .result-card h4, .result-card p, .result-card code {
+        color: white !important;
     }
     .stTextArea textarea {
         border-radius: 10px;
@@ -403,9 +472,9 @@ if analyze_btn:
 # Footer
 st.markdown("---")
 st.markdown("""
-<div style="text-align: center; padding: 2rem; background: #f8f9fa; border-radius: 10px; margin-top: 2rem;">
-    <h4>🔬 AI-Powered ADR Analysis Platform</h4>
-    <p><strong>Research Prototype</strong> • Not for Clinical Decision Making • Always Consult Healthcare Professionals</p>
-    <p><small>Powered by Sentence Transformers • MedDRA Terminology • Machine Learning</small></p>
+<div style="text-align: center; padding: 2rem; background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%); border-radius: 10px; margin-top: 2rem; color: white; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+    <h4 style="color: white; margin-bottom: 1rem;">🔬 AI-Powered ADR Analysis Platform</h4>
+    <p style="color: white; margin-bottom: 0.5rem;"><strong>Research Prototype</strong> • Not for Clinical Decision Making • Always Consult Healthcare Professionals</p>
+    <p style="color: rgba(255,255,255,0.9); margin: 0;"><small>Powered by Sentence Transformers • MedDRA Terminology • Machine Learning</small></p>
 </div>
 """, unsafe_allow_html=True)
