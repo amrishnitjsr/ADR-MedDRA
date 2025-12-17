@@ -119,10 +119,10 @@ Thumbs.db
 *.joblib
 
 # Large datasets (optional - remove lines if you want to include data)
-*.csv
-*.tsv
-*.json
-*.parquet
+# *.csv
+# *.tsv
+# *.json
+# *.parquet
 
 # Logs
 *.log
