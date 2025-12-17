@@ -221,14 +221,14 @@ st.markdown("---")
 col1, col2, col3 = st.columns([2, 1, 1])
 
 with col1:
-    analyze_btn = st.button("🔍 Analyze Clinical Text", use_container_width=True)
+    analyze_btn = st.button("🔍 Analyze Clinical Text", width='stretch')
 
 with col2:
-    if st.button("🧹 Clear Text", use_container_width=True):
-        st.experimental_rerun()
+    if st.button("🧹 Clear Text", width='stretch'):
+        st.rerun()
 
 with col3:
-    if st.button("📊 Sample Report", use_container_width=True):
+    if st.button("📊 Sample Report", width='stretch'):
         st.info("Sample analysis loaded!")
 
 def suggest_drugs_for_symptoms(symptoms_text):
@@ -277,129 +277,128 @@ if analyze_btn:
             if not filtered_results:
                 st.error(f"❌ No matches found above confidence threshold of {confidence_threshold:.2f}")
                 st.info("💡 Try lowering the confidence threshold in the sidebar")
-                return
-            
-        # Display results in organized layout
-        st.markdown("## 📊 Analysis Results")
-        
-        # Summary metrics
-        col1, col2, col3, col4 = st.columns(4)
-        with col1:
-            st.markdown('<div class="metric-card"><h3>🎯</h3><p>Drug Detection</p><h4>' + drug_status + '</h4></div>', unsafe_allow_html=True)
-        with col2:
-            st.markdown(f'<div class="metric-card"><h3>🏷️</h3><p>MedDRA Matches</p><h4>{len(filtered_results)}</h4></div>', unsafe_allow_html=True)
-        with col3:
-            avg_score = sum(r['score'] for r in filtered_results) / len(filtered_results)
-            st.markdown(f'<div class="metric-card"><h3>📈</h3><p>Avg. Confidence</p><h4>{avg_score:.3f}</h4></div>', unsafe_allow_html=True)
-        with col4:
-            st.markdown(f'<div class="metric-card"><h3>⚕️</h3><p>Analysis Mode</p><h4>{analysis_mode.split()[0]}</h4></div>', unsafe_allow_html=True)
-        
-        st.markdown("---")
-        
-        # Create three columns for comprehensive display
-        col1, col2, col3 = st.columns([2, 1, 1])
-        
-        with col1:
-            st.markdown("### 🩺 MedDRA Standardization Results")
-            
-            for i, r in enumerate(filtered_results, 1):
-                # Determine confidence level
-                if r['score'] >= 0.8:
-                    confidence_color = "#28a745"  # Green
-                    confidence_label = "High"
-                elif r['score'] >= 0.6:
-                    confidence_color = "#ffc107"  # Yellow
-                    confidence_label = "Medium"
-                else:
-                    confidence_color = "#fd7e14"  # Orange
-                    confidence_label = "Low"
+            else:
+                # Display results in organized layout
+                st.markdown("## 📊 Analysis Results")
                 
-                # -------- Decide drug display FIRST --------
-                if detected_drug:
-                    drug_display = f"**{detected_drug}** ({drug_status})"
-                else:
-                    matches = drug_kb[
-                        drug_kb["pt_name"].str.lower() == r["pt_name"].lower()
-                    ]
+                # Summary metrics
+                col1, col2, col3, col4 = st.columns(4)
+                with col1:
+                    st.markdown('<div class="metric-card"><h3>🎯</h3><p>Drug Detection</p><h4>' + drug_status + '</h4></div>', unsafe_allow_html=True)
+                with col2:
+                    st.markdown(f'<div class="metric-card"><h3>🏷️</h3><p>MedDRA Matches</p><h4>{len(filtered_results)}</h4></div>', unsafe_allow_html=True)
+                with col3:
+                    avg_score = sum(r['score'] for r in filtered_results) / len(filtered_results)
+                    st.markdown(f'<div class="metric-card"><h3>📈</h3><p>Avg. Confidence</p><h4>{avg_score:.3f}</h4></div>', unsafe_allow_html=True)
+                with col4:
+                    st.markdown(f'<div class="metric-card"><h3>⚕️</h3><p>Analysis Mode</p><h4>{analysis_mode.split()[0]}</h4></div>', unsafe_allow_html=True)
+                
+                st.markdown("---")
+                
+                # Create three columns for comprehensive display
+                col1, col2, col3 = st.columns([2, 1, 1])
+                
+                with col1:
+                    st.markdown("### 🩺 MedDRA Standardization Results")
                     
-                    if not matches.empty:
-                        drug_display = matches.iloc[0]["common_drugs"] + " (from knowledge base)"
-                    else:
-                        drug_display = "No associated drugs found"
+                    for i, r in enumerate(filtered_results, 1):
+                        # Determine confidence level
+                        if r['score'] >= 0.8:
+                            confidence_color = "#28a745"  # Green
+                            confidence_label = "High"
+                        elif r['score'] >= 0.6:
+                            confidence_color = "#ffc107"  # Yellow
+                            confidence_label = "Medium"
+                        else:
+                            confidence_color = "#fd7e14"  # Orange
+                            confidence_label = "Low"
+                        
+                        # -------- Decide drug display FIRST --------
+                        if detected_drug:
+                            drug_display = f"**{detected_drug}** ({drug_status})"
+                        else:
+                            matches = drug_kb[
+                                drug_kb["pt_name"].str.lower() == r["pt_name"].lower()
+                            ]
+                            
+                            if not matches.empty:
+                                drug_display = matches.iloc[0]["common_drugs"] + " (from knowledge base)"
+                            else:
+                                drug_display = "No associated drugs found"
+                        
+                        # -------- Display result card --------
+                        st.markdown(f"""
+                        <div class="result-card">
+                            <h4>#{i} {r['pt_name']}</h4>
+                            <p><strong>MedDRA Code:</strong> <code>{r['pt_code']}</code></p>
+                            <p><strong>Confidence:</strong> 
+                                <span style="color: {confidence_color}; font-weight: bold;">
+                                    {r['score']:.4f} ({confidence_label})
+                                </span>
+                            </p>
+                            <p><strong>💊 Associated Drug:</strong> {drug_display}</p>
+                        </div>
+                        """, unsafe_allow_html=True)
                 
-                # -------- Display result card --------
-                st.markdown(f"""
-                <div class="result-card">
-                    <h4>#{i} {r['pt_name']}</h4>
-                    <p><strong>MedDRA Code:</strong> <code>{r['pt_code']}</code></p>
-                    <p><strong>Confidence:</strong> 
-                        <span style="color: {confidence_color}; font-weight: bold;">
-                            {r['score']:.4f} ({confidence_label})
-                        </span>
-                    </p>
-                    <p><strong>💊 Associated Drug:</strong> {drug_display}</p>
-                </div>
-                """, unsafe_allow_html=True)
-        
-        with col2:
-            st.markdown("### 💊 Suggested Treatments")
-            suggested_drugs = suggest_drugs_for_symptoms(text)
-            
-            if suggested_drugs:
-                for drug in suggested_drugs:
-                    st.markdown(f"""
-                    <div class="drug-suggestion">
-                        <h5>💊 {drug}</h5>
-                        <p><small>Commonly prescribed for similar symptoms</small></p>
-                    </div>
-                    """, unsafe_allow_html=True)
-            else:
-                st.info("💡 No specific drug recommendations available for the described symptoms.")
-            
-            st.markdown("---")
-            st.markdown("**⚠️ Disclaimer:** These are general suggestions. Always consult a healthcare provider before taking any medication.")
-        
-        with col3:
-            st.markdown("### 👩‍⚕️ Specialist Recommendations")
-            suggested_doctors = suggest_doctors_for_symptoms(text)
-            
-            if suggested_doctors:
-                for doctor in suggested_doctors:
-                    st.markdown(f"""
-                    <div class="doctor-suggestion">
-                        <h5>🩺 {doctor}</h5>
-                        <p><small>Specializes in related conditions</small></p>
-                    </div>
-                    """, unsafe_allow_html=True)
-            else:
-                st.info("💡 Consider consulting your primary care physician for initial evaluation.")
-            
-            st.markdown("---")
-            st.markdown("**📞 Emergency:** If experiencing severe symptoms, seek immediate medical attention!")
-        
-        # Additional analysis section
-        st.markdown("---")
-        st.markdown("### 📈 Detailed Analysis")
-        
-        with st.expander("📊 View Detailed Confidence Scores", expanded=False):
-            chart_data = pd.DataFrame({
-                'MedDRA Term': [r['pt_name'] for r in filtered_results],
-                'Confidence Score': [r['score'] for r in filtered_results],
-                'PT Code': [r['pt_code'] for r in filtered_results]
-            })
-            st.bar_chart(chart_data.set_index('MedDRA Term')['Confidence Score'])
-            st.dataframe(chart_data, use_container_width=True)
-        
-        with st.expander("🔍 Raw Analysis Data", expanded=False):
-            st.json({
-                'input_text': text,
-                'detected_drugs': drugs,
-                'analysis_mode': analysis_mode,
-                'confidence_threshold': confidence_threshold,
-                'meddra_results': filtered_results,
-                'suggested_treatments': suggested_drugs,
-                'recommended_specialists': suggested_doctors
-            })
+                with col2:
+                    st.markdown("### 💊 Suggested Treatments")
+                    suggested_drugs = suggest_drugs_for_symptoms(text)
+                    
+                    if suggested_drugs:
+                        for drug in suggested_drugs:
+                            st.markdown(f"""
+                            <div class="drug-suggestion">
+                                <h5>💊 {drug}</h5>
+                                <p><small>Commonly prescribed for similar symptoms</small></p>
+                            </div>
+                            """, unsafe_allow_html=True)
+                    else:
+                        st.info("💡 No specific drug recommendations available for the described symptoms.")
+                    
+                    st.markdown("---")
+                    st.markdown("**⚠️ Disclaimer:** These are general suggestions. Always consult a healthcare provider before taking any medication.")
+                
+                with col3:
+                    st.markdown("### 👩‍⚕️ Specialist Recommendations")
+                    suggested_doctors = suggest_doctors_for_symptoms(text)
+                    
+                    if suggested_doctors:
+                        for doctor in suggested_doctors:
+                            st.markdown(f"""
+                            <div class="doctor-suggestion">
+                                <h5>🩺 {doctor}</h5>
+                                <p><small>Specializes in related conditions</small></p>
+                            </div>
+                            """, unsafe_allow_html=True)
+                    else:
+                        st.info("💡 Consider consulting your primary care physician for initial evaluation.")
+                    
+                    st.markdown("---")
+                    st.markdown("**📞 Emergency:** If experiencing severe symptoms, seek immediate medical attention!")
+                
+                # Additional analysis section
+                st.markdown("---")
+                st.markdown("### 📈 Detailed Analysis")
+                
+                with st.expander("📊 View Detailed Confidence Scores", expanded=False):
+                    chart_data = pd.DataFrame({
+                        'MedDRA Term': [r['pt_name'] for r in filtered_results],
+                        'Confidence Score': [r['score'] for r in filtered_results],
+                        'PT Code': [r['pt_code'] for r in filtered_results]
+                    })
+                    st.bar_chart(chart_data.set_index('MedDRA Term')['Confidence Score'])
+                    st.dataframe(chart_data, width='stretch')
+                
+                with st.expander("🔍 Raw Analysis Data", expanded=False):
+                    st.json({
+                        'input_text': text,
+                        'detected_drugs': drugs,
+                        'analysis_mode': analysis_mode,
+                        'confidence_threshold': confidence_threshold,
+                        'meddra_results': filtered_results,
+                        'suggested_treatments': suggested_drugs,
+                        'recommended_specialists': suggested_doctors
+                    })
 
 # Footer
 st.markdown("---")
